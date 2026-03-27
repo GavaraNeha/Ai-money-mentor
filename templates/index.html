@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Money Mentor</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="dashboard">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1 class="title">💸 AI Money Mentor</h1>
+        <p class="subtitle">Track • Analyze • Grow 📈</p>
+
+        <!-- 🌙 Dark Mode Toggle -->
+        <button onclick="toggleTheme()" class="toggle-btn">🌙</button>
+    </div>
+
+    <!-- FORM -->
+    <div class="card form-card">
+        <form method="POST">
+            <input type="number" name="income" placeholder="Income" required>
+            <input type="number" name="rent" placeholder="Rent" required>
+            <input type="number" name="food" placeholder="Food" required>
+            <input type="number" name="other" placeholder="Other Expenses" required>
+            <input type="number" name="goal" placeholder="Savings Goal (₹)" required>
+            <input type="number" name="time" placeholder="Goal Time (months)" required>
+            <button type="submit">Analyze</button>
+        </form>
+    </div>
+
+    {% if advice %}
+    <div class="grid">
+
+        <!-- SAVINGS -->
+        <div class="card">
+            <h2>💰 Savings</h2>
+            <h1>₹{{ savings }}</h1>
+            <p>{{ advice }}</p>
+        </div>
+
+        <!-- EXPENSE -->
+        <div class="card">
+            <h2>📊 Expense Breakdown</h2>
+            <ul>
+                <li>Rent: {{ (rent/income*100)|round(1) }}%</li>
+                <li>Food: {{ (food/income*100)|round(1) }}%</li>
+                <li>Other: {{ (other/income*100)|round(1) }}%</li>
+            </ul>
+        </div>
+
+        <!-- GOAL -->
+        <div class="card">
+            <h2>🎯 Goal</h2>
+            <p>Monthly Needed: ₹{{ monthly_required }}</p>
+            <p>Progress: {{ progress }}%</p>
+
+            <div class="progress">
+                <div class="bar" style="width: {{ progress }}%"></div>
+            </div>
+        </div>
+
+        <!-- ACTION -->
+        <div class="card">
+            <h2>💡 Action</h2>
+            <p>{{ recommendation }}</p>
+        </div>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="card chart-card">
+        <h2>📈 Expense Chart</h2>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <script>
+        var ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Rent', 'Food', 'Other'],
+                datasets: [{
+                    data: [{{ rent }}, {{ food }}, {{ other }}]
+                }]
+            }
+        });
+    </script>
+    {% endif %}
+
+    <!-- HISTORY -->
+    <div class="card history-card">
+        <h2>📅 History</h2>
+        <ul>
+            {% for item in history %}
+            <li>₹{{ item.income }} → ₹{{ item.savings }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</div>
+
+<!-- RESET -->
+<a href="/reset" class="reset-btn">🔄</a>
+
+<!-- 🌙 DARK MODE SCRIPT -->
+<script>
+function toggleTheme() {
+    document.body.classList.toggle("dark-mode");
+}
+</script>
+
+</body>
+</html>
